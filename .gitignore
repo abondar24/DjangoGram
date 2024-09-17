@@ -1,3 +1,5 @@
 .idea
 venv
 *.iml
+djangogram/media/profile_images
+djangogram/media/post_images
