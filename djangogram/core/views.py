@@ -1,4 +1,5 @@
-from lib2to3.fixes.fix_input import context
+import random
+from itertools import chain
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,6 @@ from django.shortcuts import render, redirect
 
 from .models import Profile, Post, LikePost, FollowersCount
 
-from itertools import chain
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -28,7 +28,33 @@ def index(request):
 
     posts = list(chain(*feed))
 
-    return render(request, 'index.html', {'user_profile': user_profile, 'posts':posts})
+    all_users = User.objects.all()
+    user_following_all = []
+
+    for user in user_following_found:
+        user_list = User.objects.get(username=user.user)
+        user_following_all.append(user_list)
+
+    new_suggestions = [x for x in list(all_users) if (x not in list(user_following_all))]
+    current_user = User.objects.filter(username=request.user.username)
+    suggestions = [x for x in list(new_suggestions) if (x not in list(current_user))]
+
+    random.shuffle(suggestions)
+
+    username_profiles = []
+    username_profiles_filtered = []
+
+    for users in suggestions:
+        username_profiles.append(users.id)
+
+    for ids in username_profiles:
+        profiles_filtered = Profile.objects.filter(id_user=ids)
+        username_profiles_filtered.append(profiles_filtered)
+
+    profile_suggestions = list(chain(*username_profiles_filtered))
+
+    return render(request, 'index.html', {'user_profile': user_profile,
+                                          'posts': posts, 'profile_suggestions': profile_suggestions[:4]})
 
 
 @login_required(login_url='signin')
@@ -46,6 +72,7 @@ def settings(request):
 
     return render(request, "settings.html", {'user_profile': user_profile})
 
+
 @login_required(login_url='signin')
 def upload(request):
     if request.method == 'POST':
@@ -58,8 +85,9 @@ def upload(request):
 
     return redirect('/')
 
+
 @login_required(login_url='signin')
-def profile(request,pk):
+def profile(request, pk):
     user_object = User.objects.get(username=pk)
     user_profile = Profile.objects.get(user=user_object)
     user_posts = Post.objects.filter(user=pk)
@@ -68,7 +96,7 @@ def profile(request,pk):
     follower = request.user.username
     user = pk
 
-    if FollowersCount.objects.filter(follower=follower,user=user).first():
+    if FollowersCount.objects.filter(follower=follower, user=user).first():
         button_text = 'Unfollow'
     else:
         button_text = 'Follow'
@@ -86,7 +114,8 @@ def profile(request,pk):
         'user_following_num': user_following_num
     }
 
-    return render(request, 'profile.html',context)
+    return render(request, 'profile.html', context)
+
 
 @login_required(login_url='signin')
 def like_post(request):
@@ -95,22 +124,23 @@ def like_post(request):
 
     post = Post.objects.get(id=post_id)
 
-    existing_like = LikePost.objects.filter(post_id=post_id,username=username).first()
+    existing_like = LikePost.objects.filter(post_id=post_id, username=username).first()
 
     if existing_like is None:
-        new_like = LikePost.objects.create(post_id=post_id,username=username)
+        new_like = LikePost.objects.create(post_id=post_id, username=username)
         new_like.save()
 
-        post.likes_num +=1
+        post.likes_num += 1
         post.save()
 
     else:
         existing_like.delete()
 
-        post.likes_num -=1
+        post.likes_num -= 1
         post.save()
 
     return redirect('/')
+
 
 @login_required(login_url='signin')
 def follow(request):
@@ -119,7 +149,7 @@ def follow(request):
         user = request.POST['user']
 
         if FollowersCount.objects.filter(follower=follower, user=user).first():
-            delete_follower = FollowersCount.objects.get(follower=follower,user=user)
+            delete_follower = FollowersCount.objects.get(follower=follower, user=user)
             delete_follower.delete()
         else:
             new_follower = FollowersCount.objects.create(follower=follower, user=user)
@@ -142,19 +172,21 @@ def search(request):
         username_object = User.objects.filter(username__icontains=username)
 
         username_profiles = []
-        username_profile_filtered = []
+        username_profiles_filtered = []
 
         for user in username_object:
             username_profiles.append(user.id)
 
         for ids in username_profiles:
             profiles = Profile.objects.filter(id_user=ids)
-            username_profile_filtered.append(profiles)
+            username_profiles_filtered.append(profiles)
 
-        username_profile_filtered = list(chain(*username_profile_filtered))
+        username_profiles_filtered = list(chain(*username_profiles_filtered))
 
-        return render(request, 'search.html',{'user_profile':user_profile,'username_profiles':username_profile_filtered})
+        return render(request, 'search.html',
+                      {'user_profile': user_profile, 'username_profiles': username_profiles_filtered})
     return redirect('/')
+
 
 @login_required(login_url='signin')
 def update_user_profile(user_profile, bio, location, image=None):
