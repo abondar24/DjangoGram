@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, auth
 from django.shortcuts import render, redirect
 
-from .models import Profile, Post
+from .models import Profile, Post, LikePost
 
 
 # Create your views here.
@@ -42,6 +42,30 @@ def upload(request):
         new_post = Post.objects.create(user=user, image=image, caption=caption)
         new_post.save()
 
+
+    return redirect('/')
+
+@login_required(login_url='signin')
+def like_post(request):
+    username = request.user.username
+    post_id = request.GET.get('post_id')
+
+    post = Post.objects.get(id=post_id)
+
+    existing_like = LikePost.objects.filter(post_id=post_id,username=username).first()
+
+    if existing_like is None:
+        new_like = LikePost.objects.create(post_id=post_id,username=username)
+        new_like.save()
+
+        post.likes_num +=1
+        post.save()
+
+    else:
+        existing_like.delete()
+
+        post.likes_num -=1
+        post.save()
 
     return redirect('/')
 
