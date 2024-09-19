@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 
 from .models import Profile, Post, LikePost, FollowersCount
 
+from itertools import chain
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -14,7 +15,18 @@ def index(request):
     user_object = User.objects.get(username=request.user.username)
     user_profile = Profile.objects.get(user=user_object)
 
-    posts = Post.objects.all()
+    user_following = []
+    feed = []
+
+    user_following_found = FollowersCount.objects.filter(follower=request.user.username)
+    for user in user_following_found:
+        user_following.append(user.user)
+
+    for username in user_following:
+        feed_items = Post.objects.filter(user=username)
+        feed.append(feed_items)
+
+    posts = list(chain(*feed))
 
     return render(request, 'index.html', {'user_profile': user_profile, 'posts':posts})
 
