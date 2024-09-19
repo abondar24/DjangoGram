@@ -1,3 +1,5 @@
+from lib2to3.fixes.fix_input import context
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, auth
@@ -42,8 +44,23 @@ def upload(request):
         new_post = Post.objects.create(user=user, image=image, caption=caption)
         new_post.save()
 
-
     return redirect('/')
+
+@login_required(login_url='signin')
+def profile(request,pk):
+    user_object = User.objects.get(username=pk)
+    user_profile = Profile.objects.get(user=user_object)
+    user_posts = Post.objects.filter(user=pk)
+    user_posts_num = len(user_posts)
+
+    context = {
+        'user_object': user_object,
+        'user_profile': user_profile,
+        'user_posts': user_posts,
+        'user_posts_num': user_posts_num
+    }
+
+    return render(request, 'profile.html',context)
 
 @login_required(login_url='signin')
 def like_post(request):
