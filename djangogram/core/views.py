@@ -131,6 +131,31 @@ def follow(request):
     else:
         return redirect('/')
 
+
+@login_required(login_url='signin')
+def search(request):
+    user_object = User.objects.get(username=request.user.username)
+    user_profile = Profile.objects.get(user=user_object)
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        username_object = User.objects.filter(username__icontains=username)
+
+        username_profiles = []
+        username_profile_filtered = []
+
+        for user in username_object:
+            username_profiles.append(user.id)
+
+        for ids in username_profiles:
+            profiles = Profile.objects.filter(id_user=ids)
+            username_profile_filtered.append(profiles)
+
+        username_profile_filtered = list(chain(*username_profile_filtered))
+
+        return render(request, 'search.html',{'user_profile':user_profile,'username_profiles':username_profile_filtered})
+    return redirect('/')
+
 @login_required(login_url='signin')
 def update_user_profile(user_profile, bio, location, image=None):
     """Helper function to update user profile."""
