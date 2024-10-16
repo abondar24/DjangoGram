@@ -4,16 +4,6 @@ Django demo project based on [YouTube course](https://www.youtube.com/watch?v=xS
 
 Templates are used [from this repo](https://github.com/tomitokko/django-social-media-template)
 
-## Todo
-
-- Implement post deletion
-- Implement post editing
-- Implement post sharing
-- Refactor the code in views
-- Fix session store clearing after logout
-- Implement comments
-- Implement comments disabling
-
 ## RUN
 - Run server
 ```
@@ -31,3 +21,23 @@ python manage.py makemigrations
 ```
 python manage.py createsuperuser
 ```
+
+
+<!--                                                    <li>-->
+<!--                                                        <a href="#" class="flex items-center px-3 py-2 hover:bg-gray-200 hover:text-gray-800 rounded-md ">-->
+<!--                                                            <i class="uil-share-alt mr-1"></i> Share-->
+<!--                                                        </a>-->
+<!--                                                    </li>-->
+<!--                                                    <li>-->
+<!--                                                        <a href="{% url 'edit_post' post.id %}" class="flex items-center px-3 py-2 hover:bg-gray-200 hover:text-gray-800 rounded-md ">-->
+<!--                                                            <i class="uil-edit-alt mr-1"></i> Edit Post-->
+<!--                                                        </a>-->
+<!--                                                    </li>-->
+<!--                                                    <li>-->
+<!--                                                        <a href="{% url 'disable_comments' post.id %}" class="flex items-center px-3 py-2 hover:bg-gray-200 hover:text-gray-800 rounded-md ">-->
+<!--                                                            <i class="uil-comment-slash mr-1"></i> Disable comments-->
+<!--                                                        </a>-->
+<!--                                                    </li>-->
+<!--                                                    <li>-->
+<!--                                                        <hr class="-mx-2 my-2 ">-->
+<!--                                                    </li>-->

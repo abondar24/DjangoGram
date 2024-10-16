@@ -112,13 +112,39 @@
                                 <ul class="photos">
 
                                     {% for post in user_posts %}
-                                    <li>
-                                        <a class="strip" href="{{post.image.url}}" title="" data-strip-group="mygroup"
-                                           data-strip-group-options="loop: false">
-                                            <img src="{{post.image.url}}" style="height: 250px; width: 300px;"
-                                                 alt=""></a>
-                                    </li>
-                                    {% endfor %}
+                                    <li style="list-style-type: none; margin-bottom: 20px;">
+                                        <div style="display: flex; flex-direction: column; align-items: center;">
+                                            <!-- Image Display -->
+                                            <a class="strip" href="{{post.image.url}}" title=""
+                                               data-strip-group="mygroup"
+                                               data-strip-group-options="loop: false">
+                                                <img src="{{post.image.url}}"
+                                                     style="height: 250px; width: 300px; object-fit: cover;"
+                                                     alt="Image for {{ post.caption }}">
+                                            </a>
+
+                                            <!-- Caption (if needed) -->
+                                            <p style="margin-top: 10px; font-size: 14px; color: #555;">{{post.caption}}</p>
+
+                                            <!-- Delete Post Button -->
+                                            <form action="{% url 'delete-post' %}" method="get"
+                                                  style="margin-top: 10px;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                                <button type="submit" style="
+                        background-color: #f44336;
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        ">
+                                                    Delete Post
+                                                </button>
+                                            </form>
+                                            </div>
+                                            {% endfor %}
 
                                 </ul>
                             </div><!-- photos -->
