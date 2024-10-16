@@ -62,11 +62,8 @@
                     </button>
                 </a>
                 {% endif %}
-
             </div>
         </form>
-
-
         <div class="container-fluid">
             <div class="row merged">
                 <div class="col-lg-2 col-sm-3">
@@ -80,7 +77,7 @@
                     <div class="timeline-info">
                         <ul>
                             <li class="admin-name">
-                                <h5 style="color: black;white-space: nowrap; width: 110px; font-size: 27px;"><b>@{{user_profile.user.username}}</b>
+                                <h5 style="color: black;white-space: nowrap; width: 110px; font-size: 27px;"><b>@{{user_profile.user.username}}</b></h5>
                             </li>
                         </ul>
                     </div>
@@ -94,7 +91,6 @@
         {{user_profile.bio}}
     </div>
 </section>
-
 <section>
     <div class="gap gray-bg">
         <div class="container-fluid">
@@ -126,6 +122,7 @@
                                             <!-- Caption (if needed) -->
                                             <p style="margin-top: 10px; font-size: 14px; color: #555;">{{post.caption}}</p>
 
+                                            {% if user_object.username == user.username %}
                                             <!-- Delete Post Button -->
                                             <form action="{% url 'delete-post' %}" method="get"
                                                   style="margin-top: 10px;">
@@ -143,6 +140,7 @@
                                                     Delete Post
                                                 </button>
                                             </form>
+                                            {% endif %}
                                             </div>
                                             {% endfor %}
 
