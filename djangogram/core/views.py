@@ -151,6 +151,22 @@ def delete_post(request):
 
     return redirect('/profile/' + username)
 
+@login_required(login_url='signin')
+def edit_caption(request):
+    if request.method == 'POST':
+        user = request.user.username
+
+        post_id = request.POST['post_id']
+        caption = request.POST['caption']
+
+        post = Post.objects.get(id=post_id)
+        post.caption = caption
+        post.save()
+
+        return redirect('/profile/' + user)
+    else:
+        return redirect("/")
+
 
 @login_required(login_url='signin')
 def follow(request):
