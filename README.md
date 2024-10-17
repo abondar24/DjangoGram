@@ -12,9 +12,9 @@ python manage.py runserver
 
 - Additional commands for migrations
 ```
-python manage.py migrate
-
 python manage.py makemigrations
+
+python manage.py migrate
 ```
 
 - Create admin user(for localhost:8000/admin)

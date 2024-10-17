@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, auth
 from django.shortcuts import render, redirect
 
-from .models import Profile, Post, LikePost, FollowersCount
+from .models import Profile, Post, LikePost, FollowersCount, Comment
 
 
 # Create your views here.
@@ -27,6 +27,13 @@ def index(request):
         feed.append(feed_items)
 
     posts = list(chain(*feed))
+
+    post_comments = Comment.objects.filter(post_id__in=posts.values_list('id', flat=True)).order_by('id')
+
+    # Create a dictionary of comments grouped by post
+    comments_by_post = {}
+    for post in posts:
+        comments_by_post[post.id] = post_comments.filter(post_id=str(post.id))
 
     all_users = User.objects.all()
     user_following_all = []
@@ -54,7 +61,7 @@ def index(request):
     profile_suggestions = list(chain(*username_profiles_filtered))
 
     return render(request, 'index.html', {'user_profile': user_profile,
-                                          'posts': posts, 'profile_suggestions': profile_suggestions[:4]})
+                                          'posts': posts, 'profile_suggestions': profile_suggestions[:4],'comments': comments_by_post,})
 
 
 @login_required(login_url='signin')
@@ -141,6 +148,7 @@ def like_post(request):
 
     return redirect('/')
 
+
 @login_required(login_url='signin')
 def delete_post(request):
     username = request.user.username
@@ -150,6 +158,7 @@ def delete_post(request):
     post.delete()
 
     return redirect('/profile/' + username)
+
 
 @login_required(login_url='signin')
 def edit_caption(request):
@@ -165,6 +174,18 @@ def edit_caption(request):
 
         return redirect('/profile/' + user)
     else:
+        return redirect("/")
+
+
+@login_required(login_url='signin')
+def add_comment(request):
+    if request.method == 'POST':
+        user = request.user.username
+        post_id = request.POST['post_id']
+        comment_text = request.POST['comment']
+
+        new_comment = Comment.objects.create(post_id=post_id, username=user, comment=comment_text)
+        new_comment.save()
         return redirect("/")
 
 
